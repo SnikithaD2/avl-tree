@@ -205,6 +205,7 @@ function drawLine(svg, x1, y1, x2, y2) {
     line.setAttribute("y1", y1);
     line.setAttribute("x2", x2);
     line.setAttribute("y2", y2);
-    line.setAttribute("stroke", "black");
+    line.setAttribute("stroke", "#000");
+    line.setAttribute("stroke-width", "2"); // 🔥 IMPORTANT
     svg.appendChild(line);
 }
