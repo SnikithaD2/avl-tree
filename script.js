@@ -144,3 +144,4 @@ function drawLine(p, c) {
 
     container.appendChild(line);
 }
+});
