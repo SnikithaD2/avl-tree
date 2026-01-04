@@ -4,19 +4,22 @@ class Node {
         this.left = null;
         this.right = null;
         this.height = 1;
+        this.x = 0;
+        this.y = 0;
     }
 }
 
 let root = null;
 let operationText = "None";
+const svg = document.getElementById("tree");
 
-// Utility functions
-function height(node) {
-    return node ? node.height : 0;
+// Utility
+function height(n) {
+    return n ? n.height : 0;
 }
 
-function getBalance(node) {
-    return node ? height(node.left) - height(node.right) : 0;
+function balance(n) {
+    return n ? height(n.left) - height(n.right) : 0;
 }
 
 // Rotations
@@ -58,30 +61,26 @@ function insert(node, value) {
         return node;
 
     node.height = 1 + Math.max(height(node.left), height(node.right));
-    let balance = getBalance(node);
+    let b = balance(node);
 
-    // LL
-    if (balance > 1 && value < node.left.value) {
-        operationText = "LL Rotation (Right Rotate)";
+    if (b > 1 && value < node.left.value) {
+        operationText = "LL Rotation";
         return rightRotate(node);
     }
 
-    // RR
-    if (balance < -1 && value > node.right.value) {
-        operationText = "RR Rotation (Left Rotate)";
+    if (b < -1 && value > node.right.value) {
+        operationText = "RR Rotation";
         return leftRotate(node);
     }
 
-    // LR
-    if (balance > 1 && value > node.left.value) {
-        operationText = "LR Rotation (Left + Right Rotate)";
+    if (b > 1 && value > node.left.value) {
+        operationText = "LR Rotation";
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
 
-    // RL
-    if (balance < -1 && value < node.right.value) {
-        operationText = "RL Rotation (Right + Left Rotate)";
+    if (b < -1 && value < node.right.value) {
+        operationText = "RL Rotation";
         node.right = rightRotate(node.right);
         return leftRotate(node);
     }
@@ -91,61 +90,75 @@ function insert(node, value) {
 
 // Insert handler
 function insertValue() {
-    const input = document.getElementById("value");
-    if (input.value === "") {
-        alert("Enter a value");
-        return;
-    }
+    const v = document.getElementById("value").value;
+    if (v === "") return alert("Enter a value");
 
     operationText = "No rotation needed";
-    root = insert(root, parseInt(input.value));
-
+    root = insert(root, parseInt(v));
     document.getElementById("operation").innerText =
         "Operation: " + operationText;
 
-    input.value = "";
-    renderTree();
+    document.getElementById("value").value = "";
+    drawTree();
 }
 
-// Render tree
-function renderTree() {
-    const container = document.getElementById("tree-container");
-    container.innerHTML = "";
+// Layout tree
+function setPositions(node, x, y, gap) {
+    if (!node) return;
+
+    node.x = x;
+    node.y = y;
+
+    setPositions(node.left, x - gap, y + 80, gap / 2);
+    setPositions(node.right, x + gap, y + 80, gap / 2);
+}
+
+// Draw tree
+function drawTree() {
+    svg.innerHTML = "";
     if (!root) return;
 
-    container.appendChild(createNode(root));
+    setPositions(root, 500, 40, 200);
+    drawNode(root);
 }
 
-function createNode(node) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "node-wrapper";
-
-    const nodeDiv = document.createElement("div");
-    nodeDiv.className = "node";
-    nodeDiv.innerText = node.value;
-    wrapper.appendChild(nodeDiv);
-
-    if (node.left || node.right) {
-        if (node.left) {
-            const leftLine = document.createElement("div");
-            leftLine.className = "line left-line";
-            wrapper.appendChild(leftLine);
-        }
-
-        if (node.right) {
-            const rightLine = document.createElement("div");
-            rightLine.className = "line right-line";
-            wrapper.appendChild(rightLine);
-        }
-
-        const childrenDiv = document.createElement("div");
-        childrenDiv.className = "children";
-
-        if (node.left) childrenDiv.appendChild(createNode(node.left));
-        if (node.right) childrenDiv.appendChild(createNode(node.right));
-
-        wrapper.appendChild(childrenDiv);
+function drawNode(node) {
+    if (node.left) {
+        drawLine(node, node.left);
+        drawNode(node.left);
+    }
+    if (node.right) {
+        drawLine(node, node.right);
+        drawNode(node.right);
     }
 
-    return wrapper;
+    drawCircle(node);
+}
+
+function drawLine(p, c) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", p.x);
+    line.setAttribute("y1", p.y);
+    line.setAttribute("x2", c.x);
+    line.setAttribute("y2", c.y);
+    line.setAttribute("stroke", "black");
+    svg.appendChild(line);
+}
+
+function drawCircle(node) {
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", node.x);
+    circle.setAttribute("cy", node.y);
+    circle.setAttribute("r", 18);
+    circle.setAttribute("fill", "white");
+    circle.setAttribute("stroke", "black");
+    svg.appendChild(circle);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", node.x);
+    text.setAttribute("y", node.y + 5);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-weight", "bold");
+    text.textContent = node.value;
+    svg.appendChild(text);
 }
