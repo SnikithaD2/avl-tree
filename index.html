@@ -10,13 +10,15 @@
 <h1>AVL Tree Visualizer</h1>
 
 <div class="controls">
-    <input type="number" id="value" placeholder="Enter value">
+    <input type="number" id="valueInput" placeholder="Enter value">
     <button onclick="insertValue()">Insert</button>
+    <button onclick="deleteValue()">Delete</button>
+    <button onclick="resetTree()">Reset</button>
 </div>
 
 <div id="operation">Operation: None</div>
 
-<svg id="tree" width="1000" height="500"></svg>
+<div id="treeContainer"></div>
 
 <script src="script.js"></script>
 </body>
