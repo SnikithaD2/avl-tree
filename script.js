@@ -96,12 +96,16 @@ function resetTree() {
     operationText.innerText = "Operation: Reset";
 }
 
-/* DRAW TREE (DIV BASED) */
 function renderTree() {
     container.innerHTML = "";
+
     if (!root) return;
 
-    const width = container.clientWidth;
+    // FORCE browser to recalc layout
+    const width = container.getBoundingClientRect().width;
+
+    if (width === 0) return;
+
     setPosition(root, width / 2, 40, width / 4);
     draw(root);
 }
