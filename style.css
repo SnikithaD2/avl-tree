@@ -25,26 +25,39 @@ button {
 }
 
 #treeContainer {
-    margin-top: 30px;
+    margin-top: 40px;
     display: flex;
     justify-content: center;
 }
+
+/* ---- TREE ---- */
 
 .tree {
     text-align: center;
 }
 
-.node {
-    display: inline-block;
-    background: #2e7d32;
-    color: white;
-    padding: 10px;
-    border-radius: 50%;
-    min-width: 40px;
+.node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* 👇 EACH NODE CIRCLE */
+.node {
+    width: 45px;
+    height: 45px;
+    background: #2e7d32;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* CHILDREN ROW */
 .children {
     display: flex;
-    justify-content: space-between;
+    gap: 40px;
     margin-top: 25px;
 }
