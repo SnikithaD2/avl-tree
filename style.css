@@ -42,8 +42,8 @@ button {
     align-items: center;
 }
 
-/* 👇 EACH NODE CIRCLE */
-.node {
+/* 🔥 ONLY THIS IS A CIRCLE */
+.node-circle {
     width: 45px;
     height: 45px;
     background: #2e7d32;
