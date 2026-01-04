@@ -9,20 +9,17 @@ class Node {
 
 let root = null;
 
-// Get height
 function height(node) {
     return node ? node.height : 0;
 }
 
-// Get balance factor
 function getBalance(node) {
     return node ? height(node.left) - height(node.right) : 0;
 }
 
-// Right rotation
 function rightRotate(y) {
-    const x = y.left;
-    const T2 = x.right;
+    let x = y.left;
+    let T2 = x.right;
 
     x.right = y;
     y.left = T2;
@@ -33,10 +30,9 @@ function rightRotate(y) {
     return x;
 }
 
-// Left rotation
 function leftRotate(x) {
-    const y = x.right;
-    const T2 = y.left;
+    let y = x.right;
+    let T2 = y.left;
 
     y.left = x;
     x.right = T2;
@@ -47,7 +43,6 @@ function leftRotate(x) {
     return y;
 }
 
-// Insert node
 function insert(node, value) {
     if (!node) return new Node(value);
 
@@ -59,7 +54,7 @@ function insert(node, value) {
         return node;
 
     node.height = 1 + Math.max(height(node.left), height(node.right));
-    const balance = getBalance(node);
+    let balance = getBalance(node);
 
     // LL
     if (balance > 1 && value < node.left.value)
@@ -84,41 +79,60 @@ function insert(node, value) {
     return node;
 }
 
-// Insert handler
 function insertValue() {
-    const value = document.getElementById("value").value;
-    if (value === "") return alert("Enter a value");
+    let val = document.getElementById("value").value;
+    if (val === "") return alert("Enter a value");
 
-    root = insert(root, parseInt(value));
+    root = insert(root, parseInt(val));
     document.getElementById("value").value = "";
     renderTree();
 }
 
-// Render tree (level-order)
 function renderTree() {
-    const treeDiv = document.getElementById("tree");
-    treeDiv.innerHTML = "";
-
+    const container = document.getElementById("tree-container");
+    container.innerHTML = "";
     if (!root) return;
 
-    let queue = [root];
+    container.appendChild(createNodeElement(root));
+}
 
-    while (queue.length > 0) {
-        let size = queue.length;
-        let levelDiv = document.createElement("div");
-        levelDiv.className = "level";
+function createNodeElement(node) {
+    if (!node) return null;
 
-        for (let i = 0; i < size; i++) {
-            let node = queue.shift();
+    const wrapper = document.createElement("div");
+    wrapper.className = "node-wrapper";
 
-            let nodeDiv = document.createElement("div");
-            nodeDiv.className = "node";
-            nodeDiv.innerText = node.value;
-            levelDiv.appendChild(nodeDiv);
+    const nodeDiv = document.createElement("div");
+    nodeDiv.className = "node";
+    nodeDiv.innerText = node.value;
+    wrapper.appendChild(nodeDiv);
 
-            if (node.left) queue.push(node.left);
-            if (node.right) queue.push(node.right);
+    if (node.left || node.right) {
+        const childrenDiv = document.createElement("div");
+        childrenDiv.className = "children";
+
+        if (node.left) {
+            const leftLine = document.createElement("div");
+            leftLine.className = "line left-line";
+            childrenDiv.appendChild(leftLine);
         }
-        treeDiv.appendChild(levelDiv);
+
+        if (node.right) {
+            const rightLine = document.createElement("div");
+            rightLine.className = "line right-line";
+            childrenDiv.appendChild(rightLine);
+        }
+
+        wrapper.appendChild(childrenDiv);
+
+        const childNodes = document.createElement("div");
+        childNodes.className = "tree";
+
+        if (node.left) childNodes.appendChild(createNodeElement(node.left));
+        if (node.right) childNodes.appendChild(createNodeElement(node.right));
+
+        wrapper.appendChild(childNodes);
     }
-          }
+
+    return wrapper;
+}
