@@ -4,10 +4,6 @@ body {
     background: #f4f6f8;
 }
 
-h1 {
-    margin-top: 20px;
-}
-
 .controls {
     margin: 20px;
 }
@@ -19,31 +15,65 @@ input {
 
 button {
     padding: 8px 15px;
-    margin-left: 5px;
     background: #28a745;
     border: none;
     color: white;
-    border-radius: 4px;
     cursor: pointer;
+    border-radius: 4px;
 }
 
-#tree {
-    margin-top: 30px;
+#tree-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
 }
 
 /* Tree styles */
+.tree {
+    display: flex;
+    justify-content: center;
+}
+
+.node-wrapper {
+    text-align: center;
+    position: relative;
+    padding: 20px;
+}
+
 .node {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px;
-    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
     border-radius: 50%;
     background: white;
     border: 2px solid #333;
+    margin: auto;
     font-weight: bold;
 }
 
-.level {
+/* Lines */
+.children {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    position: relative;
+}
+
+.line {
+    position: absolute;
+    width: 50%;
+    height: 20px;
+    border-top: 2px solid black;
+}
+
+.left-line {
+    left: 0;
+    transform: rotate(-20deg);
+    transform-origin: top right;
+}
+
+.right-line {
+    right: 0;
+    transform: rotate(20deg);
+    transform-origin: top left;
 }
