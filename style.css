@@ -1,52 +1,29 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #ffffff;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
 }
 
 .controls {
-    margin: 20px 0;
+  margin-bottom: 15px;
 }
 
 input {
-    padding: 8px;
-    width: 160px;
+  padding: 8px;
+  width: 160px;
 }
 
 button {
-    padding: 8px 16px;
-    margin: 5px;
-    cursor: pointer;
+  padding: 8px 14px;
+  margin-left: 5px;
+  cursor: pointer;
 }
 
-#treeContainer {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    margin-top: 30px;
-    background: #fff;
-    border-top: 2px solid #ccc;
-}
-
-/* Node circle */
-.node {
-    position: absolute;
-    width: 45px;
-    height: 45px;
-    background: #6fb35f;
-    border-radius: 50%;
-    color: white;
-    font-weight: bold;
-    line-height: 45px;
-    text-align: center;
-}
-
-/* Line */
-.line {
-    position: absolute;
-    height: 2px;
-    background: black;
-    transform-origin: left center;
+canvas {
+  border-top: 2px solid #ccc;
+  background: #ffffff;
+  display: block;
+  margin: 0 auto;
 }
