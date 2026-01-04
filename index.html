@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AVL Tree Visualizer</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>AVL Tree Visualizer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>AVL Tree Visualizer</h1>
 
 <div class="controls">
-    <input type="number" id="valueInput" placeholder="Enter value">
-    <button onclick="insertValue()">Insert</button>
-    <button onclick="deleteValue()">Delete</button>
-    <button onclick="resetTree()">Reset</button>
+  <input type="number" id="valueInput" placeholder="Enter value">
+  <button id="insertBtn">Insert</button>
+  <button id="resetBtn">Reset</button>
 </div>
 
-<h2 id="operation">Operation: None</h2>
+<p id="operation">Operation: None</p>
 
-<div id="treeContainer"></div>
+<canvas id="treeCanvas" width="1200" height="500"></canvas>
 
 <script src="script.js"></script>
 </body>
