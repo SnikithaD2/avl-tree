@@ -8,7 +8,9 @@ class Node {
 }
 
 let root = null;
+let operationText = "None";
 
+// Utility functions
 function height(node) {
     return node ? node.height : 0;
 }
@@ -17,6 +19,7 @@ function getBalance(node) {
     return node ? height(node.left) - height(node.right) : 0;
 }
 
+// Rotations
 function rightRotate(y) {
     let x = y.left;
     let T2 = x.right;
@@ -43,6 +46,7 @@ function leftRotate(x) {
     return y;
 }
 
+// Insert
 function insert(node, value) {
     if (!node) return new Node(value);
 
@@ -57,21 +61,27 @@ function insert(node, value) {
     let balance = getBalance(node);
 
     // LL
-    if (balance > 1 && value < node.left.value)
+    if (balance > 1 && value < node.left.value) {
+        operationText = "LL Rotation (Right Rotate)";
         return rightRotate(node);
+    }
 
     // RR
-    if (balance < -1 && value > node.right.value)
+    if (balance < -1 && value > node.right.value) {
+        operationText = "RR Rotation (Left Rotate)";
         return leftRotate(node);
+    }
 
     // LR
     if (balance > 1 && value > node.left.value) {
+        operationText = "LR Rotation (Left + Right Rotate)";
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
 
     // RL
     if (balance < -1 && value < node.right.value) {
+        operationText = "RL Rotation (Right + Left Rotate)";
         node.right = rightRotate(node.right);
         return leftRotate(node);
     }
@@ -79,26 +89,34 @@ function insert(node, value) {
     return node;
 }
 
+// Insert handler
 function insertValue() {
-    let val = document.getElementById("value").value;
-    if (val === "") return alert("Enter a value");
+    const input = document.getElementById("value");
+    if (input.value === "") {
+        alert("Enter a value");
+        return;
+    }
 
-    root = insert(root, parseInt(val));
-    document.getElementById("value").value = "";
+    operationText = "No rotation needed";
+    root = insert(root, parseInt(input.value));
+
+    document.getElementById("operation").innerText =
+        "Operation: " + operationText;
+
+    input.value = "";
     renderTree();
 }
 
+// Render tree
 function renderTree() {
     const container = document.getElementById("tree-container");
     container.innerHTML = "";
     if (!root) return;
 
-    container.appendChild(createNodeElement(root));
+    container.appendChild(createNode(root));
 }
 
-function createNodeElement(node) {
-    if (!node) return null;
-
+function createNode(node) {
     const wrapper = document.createElement("div");
     wrapper.className = "node-wrapper";
 
@@ -108,30 +126,25 @@ function createNodeElement(node) {
     wrapper.appendChild(nodeDiv);
 
     if (node.left || node.right) {
-        const childrenDiv = document.createElement("div");
-        childrenDiv.className = "children";
-
         if (node.left) {
             const leftLine = document.createElement("div");
             leftLine.className = "line left-line";
-            childrenDiv.appendChild(leftLine);
+            wrapper.appendChild(leftLine);
         }
 
         if (node.right) {
             const rightLine = document.createElement("div");
             rightLine.className = "line right-line";
-            childrenDiv.appendChild(rightLine);
+            wrapper.appendChild(rightLine);
         }
 
+        const childrenDiv = document.createElement("div");
+        childrenDiv.className = "children";
+
+        if (node.left) childrenDiv.appendChild(createNode(node.left));
+        if (node.right) childrenDiv.appendChild(createNode(node.right));
+
         wrapper.appendChild(childrenDiv);
-
-        const childNodes = document.createElement("div");
-        childNodes.className = "tree";
-
-        if (node.left) childNodes.appendChild(createNodeElement(node.left));
-        if (node.right) childNodes.appendChild(createNodeElement(node.right));
-
-        wrapper.appendChild(childNodes);
     }
 
     return wrapper;
