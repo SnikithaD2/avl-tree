@@ -169,18 +169,22 @@ function draw() {
 }
 
 function render(node) {
-    if (!node) return document.createElement("div");
+    if (!node) {
+        const empty = document.createElement("div");
+        empty.style.width = "45px";
+        return empty;
+    }
 
     const wrapper = document.createElement("div");
     wrapper.className = "node-wrapper";
 
-    // 👇 NODE CIRCLE
+    // ✅ ACTUAL NODE CIRCLE
     const circle = document.createElement("div");
-    circle.className = "node";
+    circle.className = "node-circle";
     circle.innerText = node.value;
     wrapper.appendChild(circle);
 
-    // 👇 CHILDREN
+    // CHILDREN
     if (node.left || node.right) {
         const children = document.createElement("div");
         children.className = "children";
