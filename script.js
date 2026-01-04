@@ -1,6 +1,8 @@
 const canvas = document.getElementById("treeCanvas");
 const ctx = canvas.getContext("2d");
-const operationText = document.getElementById("operation");
+
+let root = null;
+let operationText = document.getElementById("operation");
 
 class Node {
   constructor(value) {
@@ -13,111 +15,156 @@ class Node {
   }
 }
 
-let root = null;
-
-/* AVL LOGIC */
-function height(n) {
-  return n ? n.height : 0;
+// AVL utility functions
+function height(node) {
+  return node ? node.height : 0;
 }
 
-function rotateLeft(x) {
-  operationText.innerText = "Operation: Left Rotation";
-  const y = x.right;
-  x.right = y.left;
-  y.left = x;
-  updateHeight(x);
-  updateHeight(y);
-  return y;
+function getBalance(node) {
+  return node ? height(node.left) - height(node.right) : 0;
 }
 
-function rotateRight(y) {
+function rightRotate(y) {
   operationText.innerText = "Operation: Right Rotation";
-  const x = y.left;
-  y.left = x.right;
+
+  let x = y.left;
+  let T2 = x.right;
+
   x.right = y;
-  updateHeight(y);
-  updateHeight(x);
+  y.left = T2;
+
+  y.height = Math.max(height(y.left), height(y.right)) + 1;
+  x.height = Math.max(height(x.left), height(x.right)) + 1;
+
   return x;
 }
 
-function updateHeight(n) {
-  n.height = 1 + Math.max(height(n.left), height(n.right));
-}
+function leftRotate(x) {
+  operationText.innerText = "Operation: Left Rotation";
 
-function getBalance(n) {
-  return n ? height(n.left) - height(n.right) : 0;
+  let y = x.right;
+  let T2 = y.left;
+
+  y.left = x;
+  x.right = T2;
+
+  x.height = Math.max(height(x.left), height(x.right)) + 1;
+  y.height = Math.max(height(y.left), height(y.right)) + 1;
+
+  return y;
 }
 
 function insert(node, value) {
   if (!node) return new Node(value);
 
-  if (value < node.value) node.left = insert(node.left, value);
-  else if (value > node.value) node.right = insert(node.right, value);
-  else return node;
+  if (value < node.value)
+    node.left = insert(node.left, value);
+  else if (value > node.value)
+    node.right = insert(node.right, value);
+  else
+    return node;
 
-  updateHeight(node);
-  const balance = getBalance(node);
+  node.height = 1 + Math.max(height(node.left), height(node.right));
+  let balance = getBalance(node);
 
-  if (balance > 1 && value < node.left.value) return rotateRight(node);
-  if (balance < -1 && value > node.right.value) return rotateLeft(node);
+  // LL
+  if (balance > 1 && value < node.left.value)
+    return rightRotate(node);
 
+  // RR
+  if (balance < -1 && value > node.right.value)
+    return leftRotate(node);
+
+  // LR
+  if (balance > 1 && value > node.left.value) {
+    operationText.innerText = "Operation: Left-Right Rotation";
+    node.left = leftRotate(node.left);
+    return rightRotate(node);
+  }
+
+  // RL
+  if (balance < -1 && value < node.right.value) {
+    operationText.innerText = "Operation: Right-Left Rotation";
+    node.right = rightRotate(node.right);
+    return leftRotate(node);
+  }
+
+  operationText.innerText = "Operation: Insert";
   return node;
 }
 
-/* DRAWING */
+// Drawing
 function drawTree() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (!root) return;
-
-  setPositions(root, canvas.width / 2, 50, canvas.width / 4);
-  drawNode(root);
+  calculatePositions(root, canvas.width / 2, 50, canvas.width / 4);
+  drawEdges(root);
+  drawNodes(root);
 }
 
-function setPositions(node, x, y, gap) {
+function calculatePositions(node, x, y, gap) {
+  if (!node) return;
   node.x = x;
   node.y = y;
-  if (node.left) setPositions(node.left, x - gap, y + 80, gap / 2);
-  if (node.right) setPositions(node.right, x + gap, y + 80, gap / 2);
+  calculatePositions(node.left, x - gap, y + 80, gap / 2);
+  calculatePositions(node.right, x + gap, y + 80, gap / 2);
 }
 
-function drawNode(node) {
-  if (node.left) drawLine(node, node.left);
-  if (node.right) drawLine(node, node.right);
+function drawEdges(node) {
+  if (!node) return;
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+
+  if (node.left) {
+    ctx.beginPath();
+    ctx.moveTo(node.x, node.y);
+    ctx.lineTo(node.left.x, node.left.y);
+    ctx.stroke();
+  }
+
+  if (node.right) {
+    ctx.beginPath();
+    ctx.moveTo(node.x, node.y);
+    ctx.lineTo(node.right.x, node.right.y);
+    ctx.stroke();
+  }
+
+  drawEdges(node.left);
+  drawEdges(node.right);
+}
+
+function drawNodes(node) {
+  if (!node) return;
 
   ctx.beginPath();
-  ctx.arc(node.x, node.y, 20, 0, Math.PI * 2);
-  ctx.fillStyle = "#6fb35f";
+  ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
+  ctx.fillStyle = "#7CB342";
   ctx.fill();
+  ctx.strokeStyle = "#333";
   ctx.stroke();
 
   ctx.fillStyle = "white";
-  ctx.font = "14px Arial";
+  ctx.font = "16px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(node.value, node.x, node.y);
 
-  if (node.left) drawNode(node.left);
-  if (node.right) drawNode(node.right);
+  drawNodes(node.left);
+  drawNodes(node.right);
 }
 
-function drawLine(p, c) {
-  ctx.beginPath();
-  ctx.moveTo(p.x, p.y);
-  ctx.lineTo(c.x, c.y);
-  ctx.stroke();
+// Controls
+function insertValue() {
+  const value = parseInt(document.getElementById("valueInput").value);
+  if (isNaN(value)) return;
+  root = insert(root, value);
+  drawTree();
+  document.getElementById("valueInput").value = "";
 }
 
-/* BUTTONS */
-document.getElementById("insertBtn").onclick = () => {
-  const val = parseInt(document.getElementById("valueInput").value);
-  if (!isNaN(val)) {
-    root = insert(root, val);
-    drawTree();
-  }
-};
-
-document.getElementById("resetBtn").onclick = () => {
+function resetTree() {
   root = null;
-  operationText.innerText = "Operation: Reset";
+  operationText.innerText = "Operation: None";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
+}
