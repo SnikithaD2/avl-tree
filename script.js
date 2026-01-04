@@ -8,204 +8,195 @@ class Node {
 }
 
 let root = null;
-let operationText = "None";
+const svg = document.getElementById("treeCanvas");
 
-/* ---------- AVL LOGIC ---------- */
-
-function height(node) {
-    return node ? node.height : 0;
+function height(n) {
+    return n ? n.height : 0;
 }
 
-function getBalance(node) {
-    return node ? height(node.left) - height(node.right) : 0;
+function balanceFactor(n) {
+    return n ? height(n.left) - height(n.right) : 0;
 }
 
-function rightRotate(y) {
-    operationText = "Right Rotation (LL Case)";
+function updateHeight(n) {
+    n.height = 1 + Math.max(height(n.left), height(n.right));
+}
+
+function rotateRight(y) {
+    document.getElementById("operation").innerText = "Operation: Right Rotation";
     let x = y.left;
     let T2 = x.right;
 
     x.right = y;
     y.left = T2;
 
-    y.height = Math.max(height(y.left), height(y.right)) + 1;
-    x.height = Math.max(height(x.left), height(x.right)) + 1;
-
+    updateHeight(y);
+    updateHeight(x);
     return x;
 }
 
-function leftRotate(x) {
-    operationText = "Left Rotation (RR Case)";
+function rotateLeft(x) {
+    document.getElementById("operation").innerText = "Operation: Left Rotation";
     let y = x.right;
     let T2 = y.left;
 
     y.left = x;
     x.right = T2;
 
-    x.height = Math.max(height(x.left), height(x.right)) + 1;
-    y.height = Math.max(height(y.left), height(y.right)) + 1;
-
+    updateHeight(x);
+    updateHeight(y);
     return y;
 }
 
-function insert(node, value) {
+function insertNode(node, value) {
     if (!node) return new Node(value);
 
     if (value < node.value)
-        node.left = insert(node.left, value);
+        node.left = insertNode(node.left, value);
     else if (value > node.value)
-        node.right = insert(node.right, value);
+        node.right = insertNode(node.right, value);
     else
         return node;
 
-    node.height = 1 + Math.max(height(node.left), height(node.right));
-    let balance = getBalance(node);
+    updateHeight(node);
+
+    let balance = balanceFactor(node);
 
     if (balance > 1 && value < node.left.value)
-        return rightRotate(node);
+        return rotateRight(node);
 
     if (balance < -1 && value > node.right.value)
-        return leftRotate(node);
+        return rotateLeft(node);
 
     if (balance > 1 && value > node.left.value) {
-        operationText = "Left-Right Rotation (LR Case)";
-        node.left = leftRotate(node.left);
-        return rightRotate(node);
+        node.left = rotateLeft(node.left);
+        return rotateRight(node);
     }
 
     if (balance < -1 && value < node.right.value) {
-        operationText = "Right-Left Rotation (RL Case)";
-        node.right = rightRotate(node.right);
-        return leftRotate(node);
+        node.right = rotateRight(node.right);
+        return rotateLeft(node);
     }
 
-    operationText = "Inserted (No Rotation)";
     return node;
 }
 
 function minValueNode(node) {
-    let current = node;
-    while (current.left) current = current.left;
-    return current;
+    while (node.left) node = node.left;
+    return node;
 }
 
-function deleteNode(root, value) {
-    if (!root) return root;
+function deleteAVL(node, value) {
+    if (!node) return node;
 
-    if (value < root.value)
-        root.left = deleteNode(root.left, value);
-    else if (value > root.value)
-        root.right = deleteNode(root.right, value);
+    if (value < node.value)
+        node.left = deleteAVL(node.left, value);
+    else if (value > node.value)
+        node.right = deleteAVL(node.right, value);
     else {
-        operationText = "Node Deleted";
-        if (!root.left || !root.right) {
-            root = root.left || root.right;
-        } else {
-            let temp = minValueNode(root.right);
-            root.value = temp.value;
-            root.right = deleteNode(root.right, temp.value);
+        document.getElementById("operation").innerText = "Operation: Delete " + value;
+
+        if (!node.left || !node.right)
+            node = node.left || node.right;
+        else {
+            let temp = minValueNode(node.right);
+            node.value = temp.value;
+            node.right = deleteAVL(node.right, temp.value);
         }
     }
 
-    if (!root) return root;
+    if (!node) return node;
 
-    root.height = 1 + Math.max(height(root.left), height(root.right));
-    let balance = getBalance(root);
+    updateHeight(node);
 
-    if (balance > 1 && getBalance(root.left) >= 0)
-        return rightRotate(root);
+    let balance = balanceFactor(node);
 
-    if (balance > 1 && getBalance(root.left) < 0) {
-        root.left = leftRotate(root.left);
-        return rightRotate(root);
+    if (balance > 1 && balanceFactor(node.left) >= 0)
+        return rotateRight(node);
+
+    if (balance > 1 && balanceFactor(node.left) < 0) {
+        node.left = rotateLeft(node.left);
+        return rotateRight(node);
     }
 
-    if (balance < -1 && getBalance(root.right) <= 0)
-        return leftRotate(root);
+    if (balance < -1 && balanceFactor(node.right) <= 0)
+        return rotateLeft(node);
 
-    if (balance < -1 && getBalance(root.right) > 0) {
-        root.right = rightRotate(root.right);
-        return leftRotate(root);
+    if (balance < -1 && balanceFactor(node.right) > 0) {
+        node.right = rotateRight(node.right);
+        return rotateLeft(node);
     }
 
-    return root;
+    return node;
 }
 
-/* ---------- UI FUNCTIONS ---------- */
-
-function insertValue() {
-    const val = parseInt(document.getElementById("valueInput").value);
+function insert() {
+    let val = parseInt(document.getElementById("valueInput").value);
     if (isNaN(val)) return alert("Enter a value");
-    root = insert(root, val);
+    document.getElementById("operation").innerText = "Operation: Insert " + val;
+    root = insertNode(root, val);
     drawTree();
 }
 
-function deleteValue() {
-    const val = parseInt(document.getElementById("valueInput").value);
+function deleteNode() {
+    let val = parseInt(document.getElementById("valueInput").value);
     if (isNaN(val)) return alert("Enter a value");
-    root = deleteNode(root, val);
+    root = deleteAVL(root, val);
     drawTree();
 }
 
 function resetTree() {
     root = null;
-    operationText = "Tree Reset";
-    drawTree();
+    svg.innerHTML = "";
+    document.getElementById("operation").innerText = "Operation: Reset Tree";
 }
-
-/* ---------- SVG DRAWING ---------- */
 
 function drawTree() {
-    document.getElementById("operation").innerText =
-        "Operation: " + operationText;
-
-    const svg = document.getElementById("treeSvg");
     svg.innerHTML = "";
 
-    if (root) {
-        drawNode(svg, root, 450, 40, 200);
-    }
+    if (!root) return;
+
+    const svgWidth = svg.clientWidth;   // actual width
+    const startX = svgWidth / 2;         // center
+    const startY = 50;
+    const gap = svgWidth / 4;            // dynamic spacing
+
+    drawNode(root, startX, startY, gap);
 }
 
-function drawNode(svg, node, x, y, gap) {
-    if (!node) return;
-
+function drawNode(node, x, y, gap) {
     if (node.left) {
-        drawLine(svg, x, y, x - gap, y + 80);
-        drawNode(svg, node.left, x - gap, y + 80, gap / 1.6);
+        drawLine(x, y, x - gap, y + 80);
+        drawNode(node.left, x - gap, y + 80, gap / 2);
     }
-
     if (node.right) {
-        drawLine(svg, x, y, x + gap, y + 80);
-        drawNode(svg, node.right, x + gap, y + 80, gap / 1.6);
+        drawLine(x, y, x + gap, y + 80);
+        drawNode(node.right, x + gap, y + 80, gap / 2);
     }
 
-    // Circle
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
-    circle.setAttribute("r", 22);
-    circle.setAttribute("fill", "#2e7d32");
-    svg.appendChild(circle);
+    circle.setAttribute("r", 20);
+    circle.setAttribute("fill", "#4CAF50");
 
-    // Text
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", x);
     text.setAttribute("y", y + 5);
     text.setAttribute("text-anchor", "middle");
     text.setAttribute("fill", "white");
-    text.setAttribute("font-size", "14");
     text.textContent = node.value;
+
+    svg.appendChild(circle);
     svg.appendChild(text);
 }
 
-function drawLine(svg, x1, y1, x2, y2) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+function drawLine(x1, y1, x2, y2) {
+    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", x1);
     line.setAttribute("y1", y1);
     line.setAttribute("x2", x2);
     line.setAttribute("y2", y2);
-    line.setAttribute("stroke", "#000");
-    line.setAttribute("stroke-width", "2"); // 🔥 IMPORTANT
+    line.setAttribute("stroke", "black");
     svg.appendChild(line);
 }
