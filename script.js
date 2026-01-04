@@ -169,13 +169,18 @@ function draw() {
 }
 
 function render(node) {
-    const div = document.createElement("div");
+    if (!node) return document.createElement("div");
 
-    const n = document.createElement("div");
-    n.className = "node";
-    n.innerText = node.value;
-    div.appendChild(n);
+    const wrapper = document.createElement("div");
+    wrapper.className = "node-wrapper";
 
+    // 👇 NODE CIRCLE
+    const circle = document.createElement("div");
+    circle.className = "node";
+    circle.innerText = node.value;
+    wrapper.appendChild(circle);
+
+    // 👇 CHILDREN
     if (node.left || node.right) {
         const children = document.createElement("div");
         children.className = "children";
@@ -183,8 +188,8 @@ function render(node) {
         children.appendChild(node.left ? render(node.left) : document.createElement("div"));
         children.appendChild(node.right ? render(node.right) : document.createElement("div"));
 
-        div.appendChild(children);
+        wrapper.appendChild(children);
     }
 
-    return div;
+    return wrapper;
 }
