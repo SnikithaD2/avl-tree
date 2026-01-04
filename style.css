@@ -1,29 +1,39 @@
 body {
   font-family: Arial, sans-serif;
-  background: #ffffff;
   text-align: center;
+  background: white;
   margin: 0;
   padding: 20px;
 }
 
+h1 {
+  margin-bottom: 20px;
+}
+
 .controls {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 input {
   padding: 8px;
-  width: 160px;
+  width: 200px;
+  font-size: 16px;
 }
 
 button {
-  padding: 8px 14px;
+  padding: 8px 16px;
   margin-left: 5px;
+  font-size: 16px;
   cursor: pointer;
+}
+
+#operation {
+  margin: 15px 0;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 canvas {
   border-top: 2px solid #ccc;
-  background: #ffffff;
-  display: block;
-  margin: 0 auto;
+  background: white;
 }
