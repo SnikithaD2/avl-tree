@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background: #f4f6f8;
+    background: #f4f4f4;
 }
 
 .controls {
@@ -10,21 +10,48 @@ body {
 
 input {
     padding: 8px;
-    width: 160px;
+    width: 120px;
 }
 
 button {
-    padding: 8px 15px;
-    background: #28a745;
-    border: none;
-    color: white;
-    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 5px;
     cursor: pointer;
 }
 
 #operation {
-    margin-bottom: 10px;
-    font-size: 18px;
+    margin: 15px;
     font-weight: bold;
-    color: #d63384;
+    color: #333;
+}
+
+#treeContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.node {
+    display: inline-block;
+    min-width: 40px;
+    padding: 8px;
+    border-radius: 50%;
+    background: #4CAF50;
+    color: white;
+    position: relative;
+    margin: 10px;
+}
+
+.children {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.line {
+    position: absolute;
+    width: 2px;
+    background: black;
+    top: 40px;
+    height: 20px;
 }
