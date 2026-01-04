@@ -4,26 +4,22 @@ class Node {
         this.left = null;
         this.right = null;
         this.height = 1;
-        this.x = 0;
-        this.y = 0;
     }
 }
 
 let root = null;
-let operationText = "None";
-const svg = document.getElementById("tree");
+let operationText = "";
 
-// Utility
-function height(n) {
-    return n ? n.height : 0;
+function height(node) {
+    return node ? node.height : 0;
 }
 
-function balance(n) {
-    return n ? height(n.left) - height(n.right) : 0;
+function getBalance(node) {
+    return node ? height(node.left) - height(node.right) : 0;
 }
 
-// Rotations
 function rightRotate(y) {
+    operationText = "Right Rotation (LL Case)";
     let x = y.left;
     let T2 = x.right;
 
@@ -37,6 +33,7 @@ function rightRotate(y) {
 }
 
 function leftRotate(x) {
+    operationText = "Left Rotation (RR Case)";
     let y = x.right;
     let T2 = y.left;
 
@@ -49,7 +46,6 @@ function leftRotate(x) {
     return y;
 }
 
-// Insert
 function insert(node, value) {
     if (!node) return new Node(value);
 
@@ -61,104 +57,127 @@ function insert(node, value) {
         return node;
 
     node.height = 1 + Math.max(height(node.left), height(node.right));
-    let b = balance(node);
+    let balance = getBalance(node);
 
-    if (b > 1 && value < node.left.value) {
-        operationText = "LL Rotation";
+    if (balance > 1 && value < node.left.value)
         return rightRotate(node);
-    }
 
-    if (b < -1 && value > node.right.value) {
-        operationText = "RR Rotation";
+    if (balance < -1 && value > node.right.value)
         return leftRotate(node);
-    }
 
-    if (b > 1 && value > node.left.value) {
-        operationText = "LR Rotation";
+    if (balance > 1 && value > node.left.value) {
+        operationText = "Left-Right Rotation (LR Case)";
         node.left = leftRotate(node.left);
         return rightRotate(node);
     }
 
-    if (b < -1 && value < node.right.value) {
-        operationText = "RL Rotation";
+    if (balance < -1 && value < node.right.value) {
+        operationText = "Right-Left Rotation (RL Case)";
         node.right = rightRotate(node.right);
         return leftRotate(node);
     }
 
+    operationText = "Inserted without rotation";
     return node;
 }
 
-// Insert handler
+function minValueNode(node) {
+    let current = node;
+    while (current.left)
+        current = current.left;
+    return current;
+}
+
+function deleteNode(root, value) {
+    if (!root) return root;
+
+    if (value < root.value)
+        root.left = deleteNode(root.left, value);
+    else if (value > root.value)
+        root.right = deleteNode(root.right, value);
+    else {
+        operationText = "Node Deleted";
+        if (!root.left || !root.right) {
+            root = root.left || root.right;
+        } else {
+            let temp = minValueNode(root.right);
+            root.value = temp.value;
+            root.right = deleteNode(root.right, temp.value);
+        }
+    }
+
+    if (!root) return root;
+
+    root.height = 1 + Math.max(height(root.left), height(root.right));
+    let balance = getBalance(root);
+
+    if (balance > 1 && getBalance(root.left) >= 0)
+        return rightRotate(root);
+
+    if (balance > 1 && getBalance(root.left) < 0) {
+        operationText = "Left-Right Rotation";
+        root.left = leftRotate(root.left);
+        return rightRotate(root);
+    }
+
+    if (balance < -1 && getBalance(root.right) <= 0)
+        return leftRotate(root);
+
+    if (balance < -1 && getBalance(root.right) > 0) {
+        operationText = "Right-Left Rotation";
+        root.right = rightRotate(root.right);
+        return leftRotate(root);
+    }
+
+    return root;
+}
+
+/* ---------- UI FUNCTIONS ---------- */
+
 function insertValue() {
-    const v = document.getElementById("value").value;
-    if (v === "") return alert("Enter a value");
-
-    operationText = "No rotation needed";
-    root = insert(root, parseInt(v));
-    document.getElementById("operation").innerText =
-        "Operation: " + operationText;
-
-    document.getElementById("value").value = "";
-    drawTree();
+    const value = parseInt(document.getElementById("valueInput").value);
+    if (isNaN(value)) return alert("Enter a value");
+    operationText = "";
+    root = insert(root, value);
+    updateUI();
 }
 
-// Layout tree
-function setPositions(node, x, y, gap) {
-    if (!node) return;
-
-    node.x = x;
-    node.y = y;
-
-    setPositions(node.left, x - gap, y + 80, gap / 2);
-    setPositions(node.right, x + gap, y + 80, gap / 2);
+function deleteValue() {
+    const value = parseInt(document.getElementById("valueInput").value);
+    if (isNaN(value)) return alert("Enter a value");
+    root = deleteNode(root, value);
+    updateUI();
 }
 
-// Draw tree
-function drawTree() {
-    svg.innerHTML = "";
-    if (!root) return;
-
-    setPositions(root, 500, 40, 200);
-    drawNode(root);
+function resetTree() {
+    root = null;
+    operationText = "Tree Reset";
+    updateUI();
 }
 
-function drawNode(node) {
-    if (node.left) {
-        drawLine(node, node.left);
-        drawNode(node.left);
+function updateUI() {
+    document.getElementById("operation").innerText = "Operation: " + operationText;
+    const container = document.getElementById("treeContainer");
+    container.innerHTML = "";
+    if (root) container.appendChild(renderTree(root));
+}
+
+function renderTree(node) {
+    if (!node) return null;
+
+    const div = document.createElement("div");
+    div.className = "node";
+    div.innerText = node.value;
+
+    if (node.left || node.right) {
+        const children = document.createElement("div");
+        children.className = "children";
+
+        children.appendChild(node.left ? renderTree(node.left) : document.createElement("div"));
+        children.appendChild(node.right ? renderTree(node.right) : document.createElement("div"));
+
+        div.appendChild(children);
     }
-    if (node.right) {
-        drawLine(node, node.right);
-        drawNode(node.right);
-    }
 
-    drawCircle(node);
-}
-
-function drawLine(p, c) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", p.x);
-    line.setAttribute("y1", p.y);
-    line.setAttribute("x2", c.x);
-    line.setAttribute("y2", c.y);
-    line.setAttribute("stroke", "black");
-    svg.appendChild(line);
-}
-
-function drawCircle(node) {
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", node.x);
-    circle.setAttribute("cy", node.y);
-    circle.setAttribute("r", 18);
-    circle.setAttribute("fill", "white");
-    circle.setAttribute("stroke", "black");
-    svg.appendChild(circle);
-
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", node.x);
-    text.setAttribute("y", node.y + 5);
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("font-weight", "bold");
-    text.textContent = node.value;
-    svg.appendChild(text);
+    return div;
 }
