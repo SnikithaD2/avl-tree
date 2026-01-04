@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>AVL Tree Visualizer</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -11,17 +11,16 @@
 
 <div class="controls">
     <input type="number" id="valueInput" placeholder="Enter value">
-    <button onclick="insertValue()">Insert</button>
-    <button onclick="deleteValue()">Delete</button>
+    <button onclick="insert()">Insert</button>
+    <button onclick="deleteNode()">Delete</button>
     <button onclick="resetTree()">Reset</button>
 </div>
 
 <div id="operation">Operation: None</div>
 
-<div id="treeContainer">
-    <svg id="treeSvg" width="900" height="500"></svg>
-</div>
+<!-- IMPORTANT: SVG must have fixed height -->
+<svg id="treeCanvas" width="100%" height="500"></svg>
 
-<script src="./script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
