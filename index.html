@@ -11,15 +11,14 @@
 
 <div class="controls">
     <input type="number" id="valueInput" placeholder="Enter value">
-    <button onclick="insert()">Insert</button>
-    <button onclick="deleteNode()">Delete</button>
+    <button onclick="insertValue()">Insert</button>
+    <button onclick="deleteValue()">Delete</button>
     <button onclick="resetTree()">Reset</button>
 </div>
 
-<div id="operation">Operation: None</div>
+<h2 id="operation">Operation: None</h2>
 
-<!-- IMPORTANT: SVG must have fixed height -->
-<svg id="treeCanvas" width="100%" height="500"></svg>
+<div id="treeContainer"></div>
 
 <script src="script.js"></script>
 </body>
