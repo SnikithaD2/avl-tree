@@ -1,7 +1,11 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background: #f4f6f8;
+    background-color: #f4f6f8;
+}
+
+h1 {
+    margin-top: 20px;
 }
 
 .controls {
@@ -10,70 +14,73 @@ body {
 
 input {
     padding: 8px;
-    width: 150px;
+    width: 160px;
 }
 
 button {
     padding: 8px 15px;
-    background: #28a745;
+    background-color: #28a745;
     border: none;
     color: white;
-    cursor: pointer;
     border-radius: 4px;
+    cursor: pointer;
+}
+
+#operation {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #d63384;
 }
 
 #tree-container {
-    display: flex;
-    justify-content: center;
     margin-top: 40px;
-}
-
-/* Tree styles */
-.tree {
     display: flex;
     justify-content: center;
 }
 
+/* Tree layout */
 .node-wrapper {
-    text-align: center;
     position: relative;
-    padding: 20px;
+    text-align: center;
+    margin: 0 10px;
 }
 
 .node {
     width: 40px;
     height: 40px;
-    line-height: 40px;
     border-radius: 50%;
     background: white;
     border: 2px solid #333;
-    margin: auto;
+    line-height: 40px;
     font-weight: bold;
+    margin: auto;
 }
 
-/* Lines */
+/* Children */
 .children {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
-    position: relative;
+    margin-top: 30px;
 }
 
+/* Lines */
 .line {
     position: absolute;
     width: 50%;
-    height: 20px;
+    height: 30px;
     border-top: 2px solid black;
+    top: 45px;
 }
 
 .left-line {
     left: 0;
-    transform: rotate(-20deg);
+    transform: rotate(-30deg);
     transform-origin: top right;
 }
 
 .right-line {
     right: 0;
-    transform: rotate(20deg);
+    transform: rotate(30deg);
     transform-origin: top left;
 }
