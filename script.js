@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 class Node {
     constructor(value) {
         this.value = value;
@@ -8,6 +10,7 @@ class Node {
         this.y = 0;
     }
 }
+
 let root = null;
 const container = document.getElementById("treeContainer");
 const operationText = document.getElementById("operation");
