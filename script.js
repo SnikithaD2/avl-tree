@@ -1,8 +1,8 @@
 const canvas = document.getElementById("treeCanvas");
 const ctx = canvas.getContext("2d");
+const operationText = document.getElementById("operation");
 
 let root = null;
-let operationText = document.getElementById("operation");
 
 class Node {
   constructor(value) {
@@ -15,18 +15,17 @@ class Node {
   }
 }
 
-// AVL utility functions
-function height(node) {
-  return node ? node.height : 0;
+// ---------- AVL UTILITIES ----------
+function height(n) {
+  return n ? n.height : 0;
 }
 
-function getBalance(node) {
-  return node ? height(node.left) - height(node.right) : 0;
+function getBalance(n) {
+  return n ? height(n.left) - height(n.right) : 0;
 }
 
 function rightRotate(y) {
   operationText.innerText = "Operation: Right Rotation";
-
   let x = y.left;
   let T2 = x.right;
 
@@ -41,7 +40,6 @@ function rightRotate(y) {
 
 function leftRotate(x) {
   operationText.innerText = "Operation: Left Rotation";
-
   let y = x.right;
   let T2 = y.left;
 
@@ -54,6 +52,7 @@ function leftRotate(x) {
   return y;
 }
 
+// ---------- INSERT ----------
 function insert(node, value) {
   if (!node) return new Node(value);
 
@@ -67,24 +66,18 @@ function insert(node, value) {
   node.height = 1 + Math.max(height(node.left), height(node.right));
   let balance = getBalance(node);
 
-  // LL
   if (balance > 1 && value < node.left.value)
     return rightRotate(node);
 
-  // RR
   if (balance < -1 && value > node.right.value)
     return leftRotate(node);
 
-  // LR
   if (balance > 1 && value > node.left.value) {
-    operationText.innerText = "Operation: Left-Right Rotation";
     node.left = leftRotate(node.left);
     return rightRotate(node);
   }
 
-  // RL
   if (balance < -1 && value < node.right.value) {
-    operationText.innerText = "Operation: Right-Left Rotation";
     node.right = rightRotate(node.right);
     return leftRotate(node);
   }
@@ -93,21 +86,70 @@ function insert(node, value) {
   return node;
 }
 
-// Drawing
+// ---------- DELETE ----------
+function minValueNode(node) {
+  while (node.left) node = node.left;
+  return node;
+}
+
+function deleteNode(root, value) {
+  if (!root) return root;
+
+  if (value < root.value)
+    root.left = deleteNode(root.left, value);
+  else if (value > root.value)
+    root.right = deleteNode(root.right, value);
+  else {
+    operationText.innerText = "Operation: Delete";
+
+    if (!root.left || !root.right) {
+      root = root.left || root.right;
+    } else {
+      let temp = minValueNode(root.right);
+      root.value = temp.value;
+      root.right = deleteNode(root.right, temp.value);
+    }
+  }
+
+  if (!root) return root;
+
+  root.height = 1 + Math.max(height(root.left), height(root.right));
+  let balance = getBalance(root);
+
+  if (balance > 1 && getBalance(root.left) >= 0)
+    return rightRotate(root);
+
+  if (balance > 1 && getBalance(root.left) < 0) {
+    root.left = leftRotate(root.left);
+    return rightRotate(root);
+  }
+
+  if (balance < -1 && getBalance(root.right) <= 0)
+    return leftRotate(root);
+
+  if (balance < -1 && getBalance(root.right) > 0) {
+    root.right = rightRotate(root.right);
+    return leftRotate(root);
+  }
+
+  return root;
+}
+
+// ---------- DRAW ----------
 function drawTree() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (!root) return;
-  calculatePositions(root, canvas.width / 2, 50, canvas.width / 4);
+  setPositions(root, canvas.width / 2, 60, canvas.width / 4);
   drawEdges(root);
   drawNodes(root);
 }
 
-function calculatePositions(node, x, y, gap) {
+function setPositions(node, x, y, gap) {
   if (!node) return;
   node.x = x;
   node.y = y;
-  calculatePositions(node.left, x - gap, y + 80, gap / 2);
-  calculatePositions(node.right, x + gap, y + 80, gap / 2);
+  setPositions(node.left, x - gap, y + 80, gap / 2);
+  setPositions(node.right, x + gap, y + 80, gap / 2);
 }
 
 function drawEdges(node) {
@@ -141,7 +183,6 @@ function drawNodes(node) {
   ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
   ctx.fillStyle = "#7CB342";
   ctx.fill();
-  ctx.strokeStyle = "#333";
   ctx.stroke();
 
   ctx.fillStyle = "white";
@@ -154,13 +195,21 @@ function drawNodes(node) {
   drawNodes(node.right);
 }
 
-// Controls
+// ---------- CONTROLS ----------
 function insertValue() {
-  const value = parseInt(document.getElementById("valueInput").value);
-  if (isNaN(value)) return;
-  root = insert(root, value);
+  let v = parseInt(valueInput.value);
+  if (isNaN(v)) return;
+  root = insert(root, v);
   drawTree();
-  document.getElementById("valueInput").value = "";
+  valueInput.value = "";
+}
+
+function deleteValue() {
+  let v = parseInt(valueInput.value);
+  if (isNaN(v)) return;
+  root = deleteNode(root, v);
+  drawTree();
+  valueInput.value = "";
 }
 
 function resetTree() {
